@@ -1,0 +1,69 @@
+:root {
+
+}
+
+a {
+  color: currentColor;
+  text-decoration: none;
+}
+
+a:visited {
+  color: currentColor;
+}
+
+a[href^="https"] {
+  text-decoration: "underline";
+  font-weight: bold;
+}
+
+main {
+  min-height: 80vh;
+}
+
+body {
+  background-color: #222;
+  color: #ccc;
+  font-family: Monaco,monospace;
+  font-size: x-large;
+}
+
+/* Background color transitions */
+body {
+  transition: background-color 0.5s ease;
+}
+
+input, button {
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  font-size: 24px;
+  border-radius: 6px;
+}
+
+form input, form button {
+  display: inline-block;
+}
+
+form button {
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+}
+
+button {
+  padding: 0.5rem 2rem;
+  background-color: #ccc;
+  font-weight: bold;
+}
+
+form input {
+  color: white;
+  background-color: transparent;
+  text-align: center;
+  width: 7rem;
+}
+
+form {
+  margin: 0.5rem 0;
+}
+

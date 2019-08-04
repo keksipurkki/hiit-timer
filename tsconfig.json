@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["dom"],
+    "jsx": "react",
+    "sourceMap": false,
+    "strict": true,
+    "noUnusedLocals": true
+  }
+}
+

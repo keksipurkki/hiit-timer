@@ -1,0 +1,22 @@
+{
+  "name": "hiit-timer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c",
+    "watch": "rollup -cw"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "16.8.24",
+    "@types/react-dom": "16.8.5",
+    "rollup": "1.18.0",
+    "rollup-plugin-typescript": "1.0.1",
+    "tslib": "1.10.0",
+    "typescript": "3.5.3"
+  }
+}
