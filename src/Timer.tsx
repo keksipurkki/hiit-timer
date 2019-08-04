@@ -92,8 +92,9 @@ function registerBeeps() {
 }
 
 function Timer() {
+
   const defaults: IWorkout = {
-    sets: 3,
+    sets: 20,
     work: 30 * 1000,
     rest: 15 * 1000,
     start: false,

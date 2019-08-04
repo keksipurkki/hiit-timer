@@ -67,3 +67,30 @@ form {
   margin: 0.5rem 0;
 }
 
+#install {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  box-sizing: border-box;
+  margin: 0.5rem;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  line-height: 0;
+  background-color: #ccc;
+  color: #222;
+  font-weight: bold;
+}
+
+#install:after {
+  content: "i";
+  font-style: italic;
+}
+
+@media all and (display-mode: standalone) {
+  #install {
+    display: none;
+  }
+}

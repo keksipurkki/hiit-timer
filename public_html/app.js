@@ -103,6 +103,7 @@
                   React.createElement("button", { onClick: stop, className: "mh3" }, "Stop"))));
       }
   };
+  //# sourceMappingURL=Workout.js.map
 
   function effects(...fns) {
       return (x) => () => {
@@ -154,7 +155,7 @@
   }
   function Timer() {
       const defaults = {
-          sets: 3,
+          sets: 20,
           work: 30 * 1000,
           rest: 15 * 1000,
           start: false,
@@ -184,14 +185,19 @@
   }
   //# sourceMappingURL=Timer.js.map
 
+  function info() {
+      window.alert("For best results, add this app to your home screen.");
+  }
   const App = () => {
       return (React.createElement(React.Fragment, null,
           React.createElement("header", { className: "h3 flex items-center" },
               React.createElement("img", { className: "mh2", width: "32", height: "32", src: "icons/icon-128x128.png" }),
-              React.createElement("h3", { className: "underline" }, "L33t Timer")),
+              React.createElement("a", { href: "/" },
+                  React.createElement("h3", { className: "underline" }, "L33t Timer")),
+              React.createElement("div", { className: "ml-auto" },
+                  React.createElement("a", { id: "install", onClick: info }))),
           React.createElement(Timer, null)));
   };
   ReactDOM.render(React.createElement(App, null), document.getElementById("app"));
-  //# sourceMappingURL=index.js.map
 
 }(React, ReactDOM));
