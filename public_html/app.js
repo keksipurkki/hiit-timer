@@ -153,6 +153,13 @@
           jingles.bluup.play();
       };
   }
+  // Another hack to disable the screen lock when the timer is running
+  function disableSleep() {
+      if (!NoSleep) {
+          return;
+      }
+      new NoSleep().enable();
+  }
   function Timer() {
       const defaults = {
           sets: 20,
@@ -165,7 +172,7 @@
       const setWork = (work) => setWorkout(Object.assign({}, workout, { work }));
       const setRest = (rest) => setWorkout(Object.assign({}, workout, { rest }));
       const reset = () => setWorkout(defaults);
-      const start = effects(setWorkout, registerBeeps)(Object.assign({}, workout, { start: true }));
+      const start = effects(setWorkout, registerBeeps, disableSleep)(Object.assign({}, workout, { start: true }));
       if (workout.start) {
           return (React.createElement("main", { className: "flex flex-column justify-center" },
               React.createElement("div", { className: "flex flex-column center mv5" },
@@ -183,7 +190,6 @@
                       React.createElement("button", { onClick: start, className: "mh3" }, "Go!")))));
       }
   }
-  //# sourceMappingURL=Timer.js.map
 
   function info() {
       window.alert("For best results, add this app to your home screen.");
@@ -199,5 +205,6 @@
           React.createElement(Timer, null)));
   };
   ReactDOM.render(React.createElement(App, null), document.getElementById("app"));
+  //# sourceMappingURL=index.js.map
 
 }(React, ReactDOM));

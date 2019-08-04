@@ -91,6 +91,14 @@ function registerBeeps() {
 
 }
 
+// Another hack to disable the screen lock when the timer is running
+function disableSleep() {
+  if (!NoSleep) {
+    return;
+  }
+  new NoSleep().enable();
+}
+
 function Timer() {
 
   const defaults: IWorkout = {
@@ -106,7 +114,7 @@ function Timer() {
   const setRest = (rest: number) => setWorkout({ ...workout, rest });
 
   const reset = () => setWorkout(defaults);
-  const start = effects(setWorkout, registerBeeps)({ ...workout, start: true });
+  const start = effects(setWorkout, registerBeeps, disableSleep)({ ...workout, start: true });
 
   if (workout.start) {
     return (
