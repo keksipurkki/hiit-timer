@@ -33,8 +33,9 @@ main {
 body {
   background-color: #222;
   color: #ccc;
-  font-family: Monaco,monospace;
+  font-family: Futura, sans-serif;
   font-size: x-large;
+  padding: 3px;
 }
 
 /* Background color transitions */

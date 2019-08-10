@@ -139,6 +139,7 @@
       };
   };
   Workout.stop = () => (window.location.href = "/");
+  //# sourceMappingURL=Workout.js.map
 
   function useLongPress(effect, ms = 100) {
       const [startLongPress, setStartLongPress] = React.useState(false);
@@ -165,7 +166,7 @@
       const decrementHandlers = useLongPress(() => onChange(decrement(value)));
       const incrementHandlers = useLongPress(() => onChange(increment(value)));
       return (React.createElement("form", { className: "noselect" },
-          React.createElement("label", { className: "mr3" }, label),
+          React.createElement("label", { className: "mr3 w3 dib" }, label),
           React.createElement("button", Object.assign({ type: "button" }, decrementHandlers), "\u2212"),
           React.createElement("input", { type: "text", readOnly: true, value: format(value) }),
           React.createElement("button", Object.assign({ type: "button" }, incrementHandlers), "+")));
@@ -177,7 +178,6 @@
       format: (v) => String(v),
       value: 0,
   };
-  //# sourceMappingURL=Stepper.js.map
 
   const nullOnChange = (x) => { };
   function IntegerStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {

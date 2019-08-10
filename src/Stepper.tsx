@@ -41,7 +41,7 @@ const Stepper: React.FC<Props> = ({ onChange, format, value, label, decrement, i
 
   return (
     <form className="noselect">
-      <label className="mr3">{label}</label>
+      <label className="mr3 w3 dib">{label}</label>
       <button type="button" {...decrementHandlers}>
         −
       </button>
