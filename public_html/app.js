@@ -58,7 +58,7 @@
   }
   //# sourceMappingURL=utils.js.map
 
-  let countDownSoundEffect = (seconds) => { };
+  let countDownSoundEffect = (millis) => { };
   function tick(current) {
       const remaining = current.remaining - 1000;
       if (remaining < 0) {
@@ -76,9 +76,6 @@
               React.createElement("a", { href: "https://github.com/keksipurkki" }, "keksipurkki"))));
   };
   const Interval = props => {
-      React.useEffect(() => {
-          countDownSoundEffect(Math.floor(props.remaining / 1000));
-      });
       return (React.createElement("div", { className: "tc" },
           React.createElement("h2", { className: "mv2" }, formattedDuration(props.remaining)),
           React.createElement("p", { className: "mt2 mb5" }, props.label)));
@@ -91,17 +88,16 @@
       React.useEffect(() => {
           document.body.style.backgroundColor = current ? current.color : "#222";
       });
-      React.useEffect(() => {
-          let timer = undefined;
-          if (current) {
+      if (current) {
+          React.useEffect(() => {
+              countDownSoundEffect(current.remaining);
+              let timer = undefined;
               const updated = tick(current);
-              timer = window.setTimeout(setIntervals, 1000, [updated, ...left].filter(Boolean));
-          }
-          else {
-              timer = window.setTimeout(console.log, 0, "Workout complete!");
-          }
-          return window.clearTimeout.bind(window, timer);
-      }, [paused, current]);
+              const newIntervals = [updated, ...left].filter(Boolean);
+              timer = window.setTimeout(setIntervals, 1000, newIntervals);
+              return window.clearTimeout.bind(window, timer);
+          }, [paused, current.remaining]);
+      }
       return current ? (React.createElement(React.Fragment, null,
           React.createElement(Interval, Object.assign({}, current)),
           React.createElement("section", { className: "flex" },
@@ -115,31 +111,32 @@
           new window.NoSleep().enable();
       }
       /* Register sound effects. NB: Audio playback requires an user interaction */
-      window.SndEffects = {
-          beep: new Audio("beep.mp3"),
-          bebeep: new Audio("bluup.mp3")
+      const SndEffects = {
+          beep3: new Audio("beep3.mp3"),
+          beep2: new Audio("beep2.mp3"),
+          beep1: new Audio("beep1.mp3"),
+          bebeep: new Audio("bluup.mp3"),
       };
-      const beep = () => {
-          window.SndEffects.beep.load();
-          window.SndEffects.beep.play();
+      const play = (audio) => {
+          audio.play();
+          audio.addEventListener("ended", () => audio.load());
       };
-      const bebeep = () => {
-          window.SndEffects.bebeep.load();
-          window.SndEffects.bebeep.play();
-      };
-      countDownSoundEffect = seconds => {
-          switch (seconds) {
-              case 1:
-              case 2:
-              case 3:
-                  return beep();
+      countDownSoundEffect = (millis) => {
+          switch (millis) {
+              case 3000:
+                  return play(SndEffects.beep3);
+              case 2000:
+                  return play(SndEffects.beep2);
+              case 1000:
+                  return play(SndEffects.beep1);
               case 0:
-                  return bebeep();
+                  return play(SndEffects.bebeep);
+              default:
+                  return;
           }
       };
   };
   Workout.stop = () => (window.location.href = "/");
-  //# sourceMappingURL=Workout.js.map
 
   function useLongPress(effect, ms = 100) {
       const [startLongPress, setStartLongPress] = React.useState(false);
@@ -178,6 +175,7 @@
       format: (v) => String(v),
       value: 0,
   };
+  //# sourceMappingURL=Stepper.js.map
 
   const nullOnChange = (x) => { };
   function IntegerStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {

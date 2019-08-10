@@ -8,7 +8,7 @@ interface StaticProps {
   stop(): void;
 }
 
-let countDownSoundEffect = (seconds: number) => {};
+let countDownSoundEffect: Consumer<number> = (millis: number) => {};
 
 function tick(current: IInterval): Nullable<IInterval> {
   const remaining = current.remaining - 1000;
@@ -38,10 +38,6 @@ const ThankYou: React.FC = () => {
 };
 
 const Interval: React.FC<IInterval> = props => {
-  React.useEffect(() => {
-    countDownSoundEffect(Math.floor(props.remaining / 1000));
-  });
-
   return (
     <div className="tc">
       <h2 className="mv2">{formattedDuration(props.remaining)}</h2>
@@ -60,18 +56,18 @@ const Workout: React.FC<Props> & StaticProps = props => {
     document.body.style.backgroundColor = current ? current.color : "#222";
   });
 
-  React.useEffect(() => {
-    let timer = undefined;
+  if (current) {
+    React.useEffect(() => {
+      countDownSoundEffect(current.remaining);
 
-    if (current) {
+      let timer = undefined;
       const updated = tick(current);
-      timer = window.setTimeout(setIntervals, 1000, [updated, ...left].filter(Boolean));
-    } else {
-      timer = window.setTimeout(console.log, 0, "Workout complete!");
-    }
+      const newIntervals = [updated, ...left].filter(Boolean);
 
-    return window.clearTimeout.bind(window, timer);
-  }, [paused, current]);
+      timer = window.setTimeout(setIntervals, 1000, newIntervals);
+      return window.clearTimeout.bind(window, timer);
+    }, [paused, current.remaining]);
+  }
 
   return current ? (
     <>
@@ -99,30 +95,30 @@ Workout.start = () => {
   }
 
   /* Register sound effects. NB: Audio playback requires an user interaction */
-
-  window.SndEffects = {
-    beep: new Audio("beep.mp3"),
-    bebeep: new Audio("bluup.mp3")
+  const SndEffects = {
+    beep3: new Audio("beep3.mp3"),
+    beep2: new Audio("beep2.mp3"),
+    beep1: new Audio("beep1.mp3"),
+    bebeep: new Audio("bluup.mp3"),
   };
 
-  const beep = () => {
-    window.SndEffects.beep.load();
-    window.SndEffects.beep.play();
+  const play = (audio: HTMLMediaElement) => {
+    audio.play();
+    audio.addEventListener("ended", () => audio.load());
   };
 
-  const bebeep = () => {
-    window.SndEffects.bebeep.load();
-    window.SndEffects.bebeep.play();
-  };
-
-  countDownSoundEffect = seconds => {
-    switch (seconds) {
-      case 1:
-      case 2:
-      case 3:
-        return beep();
+  countDownSoundEffect = (millis: number) => {
+    switch (millis) {
+      case 3000:
+        return play(SndEffects.beep3);
+      case 2000:
+        return play(SndEffects.beep2);
+      case 1000:
+        return play(SndEffects.beep1);
       case 0:
-        return bebeep();
+        return play(SndEffects.bebeep);
+      default:
+        return;
     }
   };
 };

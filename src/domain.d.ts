@@ -27,5 +27,4 @@ interface IInterval {
 // Patch windows object
 interface Window { 
   NoSleep: any; 
-  SndEffects: any;
 }
