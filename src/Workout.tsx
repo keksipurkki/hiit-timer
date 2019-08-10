@@ -1,7 +1,26 @@
 import * as React from "react";
-import { formattedDuration, colorWheel } from "./utils";
+import { makeIntervals, formattedDuration } from "./utils";
 
-interface Props extends IWorkout {
+interface Props extends IWorkout {}
+
+interface StaticProps {
+  start(): void;
+  stop(): void;
+}
+
+let countDownSoundEffect = (seconds: number) => {};
+
+function tick(current: IInterval): Nullable<IInterval> {
+  const remaining = current.remaining - 1000;
+
+  if (remaining < 0) {
+    return null;
+  }
+
+  return {
+    ...current,
+    remaining,
+  };
 }
 
 const ThankYou: React.FC = () => {
@@ -18,44 +37,9 @@ const ThankYou: React.FC = () => {
   );
 };
 
-function restLabel(set: number, last: number) {
-  switch (set) {
-    case 0:
-      return "Get ready!";
-    case last:
-      return "Last round coming up!";
-    default:
-      return "Rest";
-  }
-}
-
-function makeIntervals(params: IWorkout) {
-  const intervals: IInterval[] = [];
-
-  for (let set = 0; set < params.sets; set++) {
-    intervals.push({
-      remaining: params.rest,
-      color: "#222",
-      label: restLabel(set, params.sets - 1),
-    });
-
-    intervals.push({
-      remaining: params.work,
-      color: colorWheel[set % params.sets],
-      label: `Round ${set + 1} / ${params.sets}`,
-    });
-  }
-  return intervals;
-}
-
 const Interval: React.FC<IInterval> = props => {
-
   React.useEffect(() => {
-    if (props.remaining === 0) {
-      window.bluup();
-    } else if (props.remaining <= 3000) {
-      window.beep();
-    }
+    countDownSoundEffect(Math.floor(props.remaining / 1000));
   });
 
   return (
@@ -66,64 +50,83 @@ const Interval: React.FC<IInterval> = props => {
   );
 };
 
-const Workout: React.FC<Props> = props => {
-
+const Workout: React.FC<Props> & StaticProps = props => {
   const [intervals, setIntervals] = React.useState(makeIntervals(props));
   const [paused, setPaused] = React.useState(false);
   const [current, ...left] = intervals;
+  const togglePaused = () => setPaused(!paused);
 
-  if (!current) {
+  React.useEffect(() => {
+    document.body.style.backgroundColor = current ? current.color : "#222";
+  });
 
-    React.useEffect(() => {
-      document.body.style.backgroundColor = "#222";
-    });
+  React.useEffect(() => {
+    let timer = undefined;
 
-    React.useEffect(() => {
-      const timer = window.setTimeout(console.log, 0, "Workout complete!");
-      return window.clearTimeout.bind(window, timer);
-    });
+    if (current) {
+      const updated = tick(current);
+      timer = window.setTimeout(setIntervals, 1000, [updated, ...left].filter(Boolean));
+    } else {
+      timer = window.setTimeout(console.log, 0, "Workout complete!");
+    }
 
-    return <ThankYou />;
+    return window.clearTimeout.bind(window, timer);
+  }, [paused, current]);
 
-  } else {
-
-    React.useEffect(() => {
-      document.body.style.backgroundColor = current.color;
-    });
-
-    React.useEffect(() => {
-
-      if (paused) {
-        return;
-      }
-
-      let args = [];
-
-      if (current.remaining > 0) {
-        const remaining = current.remaining - 1000;
-        args.push([{ ...current, remaining }, ...left]);
-      } else {
-        args.push(left);
-      }
-
-      const timer = window.setTimeout(setIntervals, 1000, ...args);
-      return window.clearTimeout.bind(window, timer);
-
-    }, [current.remaining, paused]);
-
-    const stop = () => window.location.href = "/";
-    const togglePaused = () => setPaused(!paused);
-
-    return (
-      <>
-        <Interval {...current} />
-        <section className="flex">
-          <button onClick={togglePaused} className="mh3">{paused ? "Resume" : "Pause"}</button>
-          <button onClick={stop} className="mh3">Stop</button>
-        </section>
-      </>
-    );
-  }
+  return current ? (
+    <>
+      <Interval {...current} />
+      <section className="flex">
+        <button onClick={togglePaused} className="mh3">
+          {paused ? "Resume" : "Pause"}
+        </button>
+        <button onClick={Workout.stop} className="mh3">
+          Stop
+        </button>
+      </section>
+    </>
+  ) : (
+    <ThankYou />
+  );
 };
+
+Workout.start = () => {
+  console.log("Assigning side effects to the workout");
+
+  /* Prevent device from going to standby */
+  if (window.NoSleep) {
+    new window.NoSleep().enable();
+  }
+
+  /* Register sound effects. NB: Audio playback requires an user interaction */
+
+  window.SndEffects = {
+    beep: new Audio("beep.mp3"),
+    bebeep: new Audio("bluup.mp3")
+  };
+
+  const beep = () => {
+    window.SndEffects.beep.load();
+    window.SndEffects.beep.play();
+  };
+
+  const bebeep = () => {
+    window.SndEffects.bebeep.load();
+    window.SndEffects.bebeep.play();
+  };
+
+  countDownSoundEffect = seconds => {
+    switch (seconds) {
+      case 1:
+      case 2:
+      case 3:
+        return beep();
+      case 0:
+        return bebeep();
+    }
+  };
+};
+
+Workout.stop = () => (window.location.href = "/");
 
 export default Workout;

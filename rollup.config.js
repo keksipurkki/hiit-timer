@@ -4,6 +4,7 @@ export default {
   input: "./src/index.tsx",
   output: {
     file: "./public_html/app.js",
+    sourcemap: true,
     format: "iife",
     globals: {
       react: "React",
