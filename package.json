@@ -12,9 +12,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/react": "16.8.24",
+    "@types/react": "16.9.1",
     "@types/react-dom": "16.8.5",
-    "rollup": "1.18.0",
+    "rollup": "1.19.4",
     "rollup-plugin-typescript": "1.0.1",
     "tslib": "1.10.0",
     "typescript": "3.5.3"
