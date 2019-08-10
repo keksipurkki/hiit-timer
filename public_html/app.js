@@ -60,10 +60,7 @@
 
   let countDownSoundEffect = (millis) => { };
   function tick(current) {
-      const remaining = current.remaining - 1000;
-      if (remaining < 0) {
-          return null;
-      }
+      const remaining = current ? current.remaining - 1000 : 0;
       return Object.assign({}, current, { remaining });
   }
   const ThankYou = () => {
@@ -83,26 +80,31 @@
   const Workout = props => {
       const [intervals, setIntervals] = React.useState(makeIntervals(props));
       const [paused, setPaused] = React.useState(false);
-      const [current, ...left] = intervals;
+      const [current, ...remaining] = intervals;
       const togglePaused = () => setPaused(!paused);
+      const millis = current ? current.remaining : 0;
+      const next = () => {
+          if (paused) {
+              return;
+          }
+          const updated = tick(current);
+          const newIntervals = updated.remaining >= 0 ? [updated, ...remaining] : remaining;
+          const timer = window.setTimeout(setIntervals, 1000, newIntervals);
+          return () => window.clearTimeout(timer);
+      };
       React.useEffect(() => {
           document.body.style.backgroundColor = current ? current.color : "#222";
       });
-      if (current) {
-          React.useEffect(() => {
-              countDownSoundEffect(current.remaining);
-              let timer = undefined;
-              const updated = tick(current);
-              const newIntervals = [updated, ...left].filter(Boolean);
-              timer = window.setTimeout(setIntervals, 1000, newIntervals);
-              return window.clearTimeout.bind(window, timer);
-          }, [paused, current.remaining]);
+      React.useEffect(next, [millis, paused]);
+      React.useEffect(() => countDownSoundEffect(millis));
+      if (!current) {
+          return React.createElement(ThankYou, null);
       }
-      return current ? (React.createElement(React.Fragment, null,
+      return (React.createElement(React.Fragment, null,
           React.createElement(Interval, Object.assign({}, current)),
           React.createElement("section", { className: "flex" },
               React.createElement("button", { onClick: togglePaused, className: "mh3" }, paused ? "Resume" : "Pause"),
-              React.createElement("button", { onClick: Workout.stop, className: "mh3" }, "Stop")))) : (React.createElement(ThankYou, null));
+              React.createElement("button", { onClick: Workout.stop, className: "mh3" }, "Stop"))));
   };
   Workout.start = () => {
       console.log("Assigning side effects to the workout");
@@ -137,6 +139,7 @@
       };
   };
   Workout.stop = () => (window.location.href = "/");
+  //# sourceMappingURL=Workout.js.map
 
   function useLongPress(effect, ms = 100) {
       const [startLongPress, setStartLongPress] = React.useState(false);
@@ -181,7 +184,7 @@
   function IntegerStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {
       const step = 1; // rounds
       const increment = (value) => Math.min(value + step, 40);
-      const decrement = (value) => Math.max(value - step, 0);
+      const decrement = (value) => Math.max(value - step, 1);
       return (React.createElement(Stepper, { onChange: onChange, label: label, value: value, increment: increment, decrement: decrement }));
   }
   function TimeStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {
@@ -200,7 +203,6 @@
               React.createElement("button", { onClick: reset, className: "mh3" }, "Reset"),
               React.createElement("button", { onClick: effects(Workout.start, start).bind(undefined, workout), className: "mh3" }, "Go!"))));
   };
-  //# sourceMappingURL=Timer.js.map
 
   const defaultWorkout = {
       sets: 20,

@@ -10,17 +10,14 @@ interface StaticProps {
 
 let countDownSoundEffect: Consumer<number> = (millis: number) => {};
 
-function tick(current: IInterval): Nullable<IInterval> {
-  const remaining = current.remaining - 1000;
-
-  if (remaining < 0) {
-    return null;
-  }
+function tick(current: IInterval): IInterval {
+  const remaining = current ? current.remaining - 1000 : 0;
 
   return {
     ...current,
     remaining,
   };
+
 }
 
 const ThankYou: React.FC = () => {
@@ -47,29 +44,39 @@ const Interval: React.FC<IInterval> = props => {
 };
 
 const Workout: React.FC<Props> & StaticProps = props => {
+
   const [intervals, setIntervals] = React.useState(makeIntervals(props));
   const [paused, setPaused] = React.useState(false);
-  const [current, ...left] = intervals;
+  const [current, ...remaining] = intervals;
   const togglePaused = () => setPaused(!paused);
+  const millis = current ? current.remaining : 0;
+
+  const next = () => {
+
+    if (paused) {
+      return;
+    }
+
+    const updated = tick(current);
+    const newIntervals = updated.remaining >= 0 ? [updated, ...remaining] : remaining;
+    const timer = window.setTimeout(setIntervals, 1000, newIntervals);
+
+    return () => window.clearTimeout(timer);
+  };
 
   React.useEffect(() => {
     document.body.style.backgroundColor = current ? current.color : "#222";
   });
 
-  if (current) {
-    React.useEffect(() => {
-      countDownSoundEffect(current.remaining);
+  React.useEffect(next, [millis, paused]);
 
-      let timer = undefined;
-      const updated = tick(current);
-      const newIntervals = [updated, ...left].filter(Boolean);
+  React.useEffect(() => countDownSoundEffect(millis));
 
-      timer = window.setTimeout(setIntervals, 1000, newIntervals);
-      return window.clearTimeout.bind(window, timer);
-    }, [paused, current.remaining]);
+  if (!current) {
+    return <ThankYou />;
   }
 
-  return current ? (
+  return (
     <>
       <Interval {...current} />
       <section className="flex">
@@ -81,8 +88,6 @@ const Workout: React.FC<Props> & StaticProps = props => {
         </button>
       </section>
     </>
-  ) : (
-    <ThankYou />
   );
 };
 

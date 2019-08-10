@@ -11,7 +11,7 @@ const nullOnChange = (x: number) => {};
 function IntegerStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {
   const step = 1; // rounds
   const increment = (value: number) => Math.min(value + step, 40);
-  const decrement = (value: number) => Math.max(value - step, 0);
+  const decrement = (value: number) => Math.max(value - step, 1);
   return (
     <Stepper
       onChange={onChange}
