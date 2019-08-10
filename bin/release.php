@@ -36,6 +36,6 @@
       crossorigin=""
       src="https://unpkg.com/react-dom@16.8.6/umd/react-dom.production.min.js"
     ></script>
-   <script src="app.js/?hash=<?= $hash; ?>"></script>
+   <script src="/app.js?hash=<?= $hash; ?>"></script>
   </body>
 </html>
