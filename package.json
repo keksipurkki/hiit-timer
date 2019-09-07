@@ -1,23 +1,25 @@
 {
   "name": "hiit-timer",
   "version": "1.0.0",
-  "description": "",
+  "description": "HIIT Timer",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c",
-    "watch": "rollup -cw"
+    "watch": "rollup -cw",
+    "lint": "eslint --ext='.ts,.tsx' src"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Elias A. Toivanen",
+  "homepage": "http://l33t-timer.keksipurkki.net",
+  "license": "MIT",
   "devDependencies": {
-    "@types/react": "16.9.1",
-    "@types/react-dom": "16.8.5",
-    "rollup": "1.19.4",
+    "@types/react": "16.9.2",
+    "@types/react-dom": "16.9.0",
+    "rollup": "1.20.3",
     "rollup-plugin-typescript": "1.0.1",
     "tslib": "1.10.0",
-    "typescript": "3.5.3"
+    "typescript": "3.6.2"
   },
   "dependencies": {}
 }

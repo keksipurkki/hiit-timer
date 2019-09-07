@@ -35,6 +35,7 @@ function useLongPress(effect: Effect, ms = 100) {
 }
 
 const Stepper: React.FC<Props> = ({ onChange, format, value, label, decrement, increment }) => {
+  if (!format) throw new Error("invalid_state");
 
   const decrementHandlers = useLongPress(() => onChange(decrement(value)));
   const incrementHandlers = useLongPress(() => onChange(increment(value)));
@@ -45,7 +46,7 @@ const Stepper: React.FC<Props> = ({ onChange, format, value, label, decrement, i
       <button type="button" {...decrementHandlers}>
         −
       </button>
-      <input type="text" readOnly value={format!(value)} />
+      <input type="text" readOnly value={format(value)} />
       <button type="button" {...incrementHandlers}>
         +
       </button>

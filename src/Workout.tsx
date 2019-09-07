@@ -1,131 +1,167 @@
 import * as React from "react";
-import { makeIntervals, formattedDuration } from "./utils";
+import { colorWheel, effects, formattedDuration } from "./utils";
 
-interface Props extends IWorkout {}
+type Props = WorkoutProps;
 
 interface StaticProps {
   start(): void;
   stop(): void;
 }
 
-let countDownSoundEffect: Consumer<number> = (millis: number) => {};
+interface Intervals {
+  togglePause(): void;
+  interval: Nullable<IntervalProps>;
+}
 
-function tick(current: IInterval): IInterval {
-  const remaining = current ? current.remaining - 1000 : 0;
+type IntervalTuple = [IntervalProps, Consumer<IntervalProps>];
+
+function backgroundEffect([interval]: IntervalTuple) {
+  document.body.style.backgroundColor = interval.color;
+}
+
+function tickEffect([interval, setInterval]: IntervalTuple) {
+  const timeout = 1000; // millis
+  const { remaining, next } = interval;
+  const updated = remaining > 0 ? { ...interval, remaining: remaining - timeout } : next;
+  const timer = window.setTimeout(setInterval, timeout, updated);
+  return () => window.clearTimeout(timer);
+}
+
+function soundEffect([interval]: IntervalTuple) {
+  const { remaining } = interval;
+  window.HiitTimer.soundEffects(remaining);
+}
+
+const effect = effects(tickEffect, soundEffect, backgroundEffect);
+
+function makeInterval(props: WorkoutProps, total: number): Nullable<IntervalProps> {
+  const { sets, ...rest } = props;
+
+  if (sets <= 0) {
+    return null;
+  }
+
+  const next = makeInterval(
+    {
+      ...rest,
+      sets: sets - 1,
+    },
+    total
+  );
 
   return {
-    ...current,
-    remaining,
+    label: "Rest",
+    color: "#222",
+    paused: false,
+    remaining: props.rest,
+    next: {
+      label: `Round ${total - sets + 1} / ${total}`,
+      paused: false,
+      remaining: props.work,
+      color: colorWheel[sets % colorWheel.length],
+      next,
+    },
+  };
+}
+
+function makeIntervals(props: WorkoutProps): Intervals {
+  const total = props.sets;
+  const [interval, setInterval] = React.useState(() => makeInterval(props, total));
+
+  React.useEffect(() => {
+    if (interval && !interval.paused) {
+      return effect([interval, setInterval]);
+    }
+  });
+
+  const togglePause = () => {
+    if (interval) {
+      setInterval({ ...interval, paused: !interval.paused });
+    }
+  };
+
+  return {
+    togglePause,
+    interval,
   };
 
 }
 
-const ThankYou: React.FC = () => {
-  return (
-    <div className="tc">
-      <h2>Congratulations!</h2>
-      <p>
-        <a href="/">Next workout?</a>
-      </p>
-      <small>
-        Brought to your by <a href="https://github.com/keksipurkki">keksipurkki</a>
-      </small>
-    </div>
-  );
-};
-
-const Interval: React.FC<IInterval> = props => {
-  return (
-    <div className="tc">
-      <h2 className="mv2">{formattedDuration(props.remaining)}</h2>
-      <p className="mt2 mb5">{props.label}</p>
-    </div>
-  );
-};
-
 const Workout: React.FC<Props> & StaticProps = props => {
-
-  const [intervals, setIntervals] = React.useState(makeIntervals(props));
-  const [paused, setPaused] = React.useState(false);
-  const [current, ...remaining] = intervals;
-  const togglePaused = () => setPaused(!paused);
-  const millis = current ? current.remaining : 0;
-
-  const next = () => {
-
-    if (paused) {
-      return;
-    }
-
-    const updated = tick(current);
-    const newIntervals = updated.remaining >= 0 ? [updated, ...remaining] : remaining;
-    const timer = window.setTimeout(setIntervals, 1000, newIntervals);
-
-    return () => window.clearTimeout(timer);
-  };
-
-  React.useEffect(() => {
-    document.body.style.backgroundColor = current ? current.color : "#222";
-  });
-
-  React.useEffect(next, [millis, paused]);
-
-  React.useEffect(() => countDownSoundEffect(millis));
-
-  if (!current) {
-    return <ThankYou />;
+  const { togglePause, interval } = makeIntervals(props);
+  if (interval) {
+    return (
+      <>
+        <div className="tc">
+          <h2 className="mv2">{formattedDuration(interval.remaining)}</h2>
+          <p className="mt2 mb5">{interval.label}</p>
+        </div>
+        <section className="flex">
+          <button onClick={togglePause} className="mh3">
+            {interval.paused ? "Resume" : "Pause"}
+          </button>
+          <button onClick={Workout.stop} className="mh3">
+            Stop
+          </button>
+        </section>
+      </>
+    );
+  } else {
+    return (
+      <div className="tc">
+        <h2>Congratulations!</h2>
+        <p>
+          <a href="/">Next workout?</a>
+        </p>
+        <small>
+          Brought to your by <a href="https://github.com/keksipurkki">keksipurkki</a>
+        </small>
+      </div>
+    );
   }
-
-  return (
-    <>
-      <Interval {...current} />
-      <section className="flex">
-        <button onClick={togglePaused} className="mh3">
-          {paused ? "Resume" : "Pause"}
-        </button>
-        <button onClick={Workout.stop} className="mh3">
-          Stop
-        </button>
-      </section>
-    </>
-  );
 };
 
 Workout.start = () => {
+
   console.log("Assigning side effects to the workout");
 
   /* Prevent device from going to standby */
-  if (window.NoSleep) {
-    new window.NoSleep().enable();
+  if (NoSleep) {
+    new NoSleep().enable();
   }
 
   /* Register sound effects. NB: Audio playback requires an user interaction */
-  const SndEffects = {
-    beep3: new Audio("beep3.mp3"),
-    beep2: new Audio("beep2.mp3"),
-    beep1: new Audio("beep1.mp3"),
-    bebeep: new Audio("bluup.mp3"),
+  const sndEffects = {
+    beep3: new Audio("snd/beep3.mp3"),
+    beep2: new Audio("snd/beep2.mp3"),
+    beep1: new Audio("snd/beep1.mp3"),
+    beep0: new Audio("snd/beep0.mp3"),
   };
 
   const play = (audio: HTMLMediaElement) => {
     audio.play();
-    audio.addEventListener("ended", () => audio.load());
+    audio.addEventListener("ended", audio.load.bind(audio));
   };
 
-  countDownSoundEffect = (millis: number) => {
-    switch (millis) {
-      case 3000:
-        return play(SndEffects.beep3);
-      case 2000:
-        return play(SndEffects.beep2);
-      case 1000:
-        return play(SndEffects.beep1);
-      case 0:
-        return play(SndEffects.bebeep);
-      default:
-        return;
-    }
+  const HiitTimer = {
+    soundEffects: (millis: number) => {
+      switch (millis) {
+        case 3000:
+          return play(sndEffects.beep3);
+        case 2000:
+          return play(sndEffects.beep2);
+        case 1000:
+          return play(sndEffects.beep1);
+        case 0:
+          return play(sndEffects.beep0);
+        default:
+          return;
+      }
+    },
   };
+
+  window.HiitTimer = HiitTimer;
+
 };
 
 Workout.stop = () => (window.location.href = "/");

@@ -1,12 +1,10 @@
 import * as React from "react";
 import Stepper from "./Stepper";
 import { formattedDuration } from "./utils";
-import Workout from "./Workout";
-import { effects } from "./utils";
 
-interface Props extends IWorkoutTimer {}
+type Props = TimerProps;
 
-const nullOnChange = (x: number) => {};
+const nullOnChange = (_x: number) => {};
 
 function IntegerStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {
   const step = 1; // rounds
@@ -51,7 +49,7 @@ const Timer: React.FC<Props> = ({ start, reset, setSets, setWork, setRest, worko
         <button onClick={reset} className="mh3">
           Reset
         </button>
-        <button onClick={effects(Workout.start, start).bind(undefined, workout)} className="mh3">
+        <button onClick={start} className="mh3">
           Go!
         </button>
       </section>

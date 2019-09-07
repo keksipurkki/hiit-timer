@@ -1,4 +1,12 @@
-function restLabel(set: number, last: number) {
+export const defaultWorkout: WorkoutProps = {
+  sets: 20,
+  work: 30 * 1000,
+  rest: 15 * 1000,
+  start: false,
+};
+
+
+export function restLabel(set: number, last: number) {
   switch (set) {
     case 0:
       return "Get ready!";
@@ -9,21 +17,17 @@ function restLabel(set: number, last: number) {
   }
 }
 
-const colorWheel = [
-  "#cb4b16",
-  "#dc322f",
-  "#d33682",
-  "#6c71c4"
-];
+export const colorWheel = ["#cb4b16", "#dc322f", "#d33682", "#6c71c4"];
 
 export function formattedDuration(millis: number) {
   const [, duration] = new Date(millis).toISOString().split("T");
   return duration.substr(4, 4);
 }
 
-export function effects<T>(...fns: Consumer<T>[]) {
+export function effects<T>(...fns: ConsumerEffect<T>[]) {
   return (x: T) => {
-    return fns.filter(Boolean).map(f => f(x));
+    const cancels = fns.map(f => f(x));
+    return () => { cancels.map(c => c && c()); };
   };
 }
 
@@ -31,26 +35,3 @@ export function sleep(millis: number) {
   return new Promise(resolve => setTimeout(resolve, millis));
 }
 
-export function makeIntervals(params: IWorkout) {
-
-  const intervals: IInterval[] = [];
-
-  for (let set = 0; set < params.sets; set++) {
-
-    intervals.push({
-      remaining: params.rest,
-      color: "#222",
-      label: restLabel(set, params.sets - 1),
-    });
-
-    intervals.push({
-      remaining: params.work,
-      color: colorWheel[set % colorWheel.length],
-      label: `Round ${set + 1} / ${params.sets}`,
-    });
-
-  }
-
-  return intervals;
-
-}

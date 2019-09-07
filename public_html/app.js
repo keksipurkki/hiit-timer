@@ -15,131 +15,162 @@
           React.createElement("div", { className: "flex flex-column center mv5" }, children))));
   //# sourceMappingURL=AppShell.js.map
 
-  function restLabel(set, last) {
-      switch (set) {
-          case 0:
-              return "Get ready!";
-          case last:
-              return "Last round coming up!";
-          default:
-              return "Rest";
-      }
+  /*! *****************************************************************************
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+  this file except in compliance with the License. You may obtain a copy of the
+  License at http://www.apache.org/licenses/LICENSE-2.0
+
+  THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+  WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+  MERCHANTABLITY OR NON-INFRINGEMENT.
+
+  See the Apache Version 2.0 License for specific language governing permissions
+  and limitations under the License.
+  ***************************************************************************** */
+
+  function __rest(s, e) {
+      var t = {};
+      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+          t[p] = s[p];
+      if (s != null && typeof Object.getOwnPropertySymbols === "function")
+          for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+              if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                  t[p[i]] = s[p[i]];
+          }
+      return t;
   }
-  const colorWheel = [
-      "#cb4b16",
-      "#dc322f",
-      "#d33682",
-      "#6c71c4"
-  ];
+
+  const defaultWorkout = {
+      sets: 20,
+      work: 30 * 1000,
+      rest: 15 * 1000,
+      start: false,
+  };
+  const colorWheel = ["#cb4b16", "#dc322f", "#d33682", "#6c71c4"];
   function formattedDuration(millis) {
       const [, duration] = new Date(millis).toISOString().split("T");
       return duration.substr(4, 4);
   }
   function effects(...fns) {
       return (x) => {
-          return fns.filter(Boolean).map(f => f(x));
+          const cancels = fns.map(f => f(x));
+          return () => { cancels.map(c => c && c()); };
       };
-  }
-  function makeIntervals(params) {
-      const intervals = [];
-      for (let set = 0; set < params.sets; set++) {
-          intervals.push({
-              remaining: params.rest,
-              color: "#222",
-              label: restLabel(set, params.sets - 1),
-          });
-          intervals.push({
-              remaining: params.work,
-              color: colorWheel[set % colorWheel.length],
-              label: `Round ${set + 1} / ${params.sets}`,
-          });
-      }
-      return intervals;
   }
   //# sourceMappingURL=utils.js.map
 
-  let countDownSoundEffect = (millis) => { };
-  function tick(current) {
-      const remaining = current ? current.remaining - 1000 : 0;
-      return Object.assign({}, current, { remaining });
+  function backgroundEffect([interval]) {
+      document.body.style.backgroundColor = interval.color;
   }
-  const ThankYou = () => {
-      return (React.createElement("div", { className: "tc" },
-          React.createElement("h2", null, "Congratulations!"),
-          React.createElement("p", null,
-              React.createElement("a", { href: "/" }, "Next workout?")),
-          React.createElement("small", null,
-              "Brought to your by ",
-              React.createElement("a", { href: "https://github.com/keksipurkki" }, "keksipurkki"))));
-  };
-  const Interval = props => {
-      return (React.createElement("div", { className: "tc" },
-          React.createElement("h2", { className: "mv2" }, formattedDuration(props.remaining)),
-          React.createElement("p", { className: "mt2 mb5" }, props.label)));
-  };
-  const Workout = props => {
-      const [intervals, setIntervals] = React.useState(makeIntervals(props));
-      const [paused, setPaused] = React.useState(false);
-      const [current, ...remaining] = intervals;
-      const togglePaused = () => setPaused(!paused);
-      const millis = current ? current.remaining : 0;
-      const next = () => {
-          if (paused) {
-              return;
-          }
-          const updated = tick(current);
-          const newIntervals = updated.remaining >= 0 ? [updated, ...remaining] : remaining;
-          const timer = window.setTimeout(setIntervals, 1000, newIntervals);
-          return () => window.clearTimeout(timer);
-      };
-      React.useEffect(() => {
-          document.body.style.backgroundColor = current ? current.color : "#222";
-      });
-      React.useEffect(next, [millis, paused]);
-      React.useEffect(() => countDownSoundEffect(millis));
-      if (!current) {
-          return React.createElement(ThankYou, null);
+  function tickEffect([interval, setInterval]) {
+      const timeout = 1000; // millis
+      const { remaining, next } = interval;
+      const updated = remaining > 0 ? Object.assign(Object.assign({}, interval), { remaining: remaining - timeout }) : next;
+      const timer = window.setTimeout(setInterval, timeout, updated);
+      return () => window.clearTimeout(timer);
+  }
+  function soundEffect([interval]) {
+      const { remaining } = interval;
+      window.HiitTimer.soundEffects(remaining);
+  }
+  const effect = effects(tickEffect, soundEffect, backgroundEffect);
+  function makeInterval(props, total) {
+      const { sets } = props, rest = __rest(props, ["sets"]);
+      if (sets <= 0) {
+          return null;
       }
-      return (React.createElement(React.Fragment, null,
-          React.createElement(Interval, Object.assign({}, current)),
-          React.createElement("section", { className: "flex" },
-              React.createElement("button", { onClick: togglePaused, className: "mh3" }, paused ? "Resume" : "Pause"),
-              React.createElement("button", { onClick: Workout.stop, className: "mh3" }, "Stop"))));
+      const next = makeInterval(Object.assign(Object.assign({}, rest), { sets: sets - 1 }), total);
+      return {
+          label: "Rest",
+          color: "#222",
+          paused: false,
+          remaining: props.rest,
+          next: {
+              label: `Round ${total - sets + 1} / ${total}`,
+              paused: false,
+              remaining: props.work,
+              color: colorWheel[sets % colorWheel.length],
+              next,
+          },
+      };
+  }
+  function makeIntervals(props) {
+      const total = props.sets;
+      const [interval, setInterval] = React.useState(() => makeInterval(props, total));
+      React.useEffect(() => {
+          if (interval && !interval.paused) {
+              return effect([interval, setInterval]);
+          }
+      });
+      const togglePause = () => {
+          if (interval) {
+              setInterval(Object.assign(Object.assign({}, interval), { paused: !interval.paused }));
+          }
+      };
+      return {
+          togglePause,
+          interval,
+      };
+  }
+  const Workout = props => {
+      const { togglePause, interval } = makeIntervals(props);
+      if (interval) {
+          return (React.createElement(React.Fragment, null,
+              React.createElement("div", { className: "tc" },
+                  React.createElement("h2", { className: "mv2" }, formattedDuration(interval.remaining)),
+                  React.createElement("p", { className: "mt2 mb5" }, interval.label)),
+              React.createElement("section", { className: "flex" },
+                  React.createElement("button", { onClick: togglePause, className: "mh3" }, interval.paused ? "Resume" : "Pause"),
+                  React.createElement("button", { onClick: Workout.stop, className: "mh3" }, "Stop"))));
+      }
+      else {
+          return (React.createElement("div", { className: "tc" },
+              React.createElement("h2", null, "Congratulations!"),
+              React.createElement("p", null,
+                  React.createElement("a", { href: "/" }, "Next workout?")),
+              React.createElement("small", null,
+                  "Brought to your by ",
+                  React.createElement("a", { href: "https://github.com/keksipurkki" }, "keksipurkki"))));
+      }
   };
   Workout.start = () => {
       console.log("Assigning side effects to the workout");
       /* Prevent device from going to standby */
-      if (window.NoSleep) {
-          new window.NoSleep().enable();
+      if (NoSleep) {
+          new NoSleep().enable();
       }
       /* Register sound effects. NB: Audio playback requires an user interaction */
-      const SndEffects = {
-          beep3: new Audio("beep3.mp3"),
-          beep2: new Audio("beep2.mp3"),
-          beep1: new Audio("beep1.mp3"),
-          bebeep: new Audio("bluup.mp3"),
+      const sndEffects = {
+          beep3: new Audio("snd/beep3.mp3"),
+          beep2: new Audio("snd/beep2.mp3"),
+          beep1: new Audio("snd/beep1.mp3"),
+          beep0: new Audio("snd/beep0.mp3"),
       };
       const play = (audio) => {
           audio.play();
-          audio.addEventListener("ended", () => audio.load());
+          audio.addEventListener("ended", audio.load.bind(audio));
       };
-      countDownSoundEffect = (millis) => {
-          switch (millis) {
-              case 3000:
-                  return play(SndEffects.beep3);
-              case 2000:
-                  return play(SndEffects.beep2);
-              case 1000:
-                  return play(SndEffects.beep1);
-              case 0:
-                  return play(SndEffects.bebeep);
-              default:
-                  return;
-          }
+      const HiitTimer = {
+          soundEffects: (millis) => {
+              switch (millis) {
+                  case 3000:
+                      return play(sndEffects.beep3);
+                  case 2000:
+                      return play(sndEffects.beep2);
+                  case 1000:
+                      return play(sndEffects.beep1);
+                  case 0:
+                      return play(sndEffects.beep0);
+                  default:
+                      return;
+              }
+          },
       };
+      window.HiitTimer = HiitTimer;
   };
   Workout.stop = () => (window.location.href = "/");
-  //# sourceMappingURL=Workout.js.map
 
   function useLongPress(effect, ms = 100) {
       const [startLongPress, setStartLongPress] = React.useState(false);
@@ -163,6 +194,8 @@
       };
   }
   const Stepper = ({ onChange, format, value, label, decrement, increment }) => {
+      if (!format)
+          throw new Error("invalid_state");
       const decrementHandlers = useLongPress(() => onChange(decrement(value)));
       const incrementHandlers = useLongPress(() => onChange(increment(value)));
       return (React.createElement("form", { className: "noselect" },
@@ -180,7 +213,7 @@
   };
   //# sourceMappingURL=Stepper.js.map
 
-  const nullOnChange = (x) => { };
+  const nullOnChange = (_x) => { };
   function IntegerStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {
       const step = 1; // rounds
       const increment = (value) => Math.min(value + step, 40);
@@ -201,35 +234,30 @@
               React.createElement(TimeStepper, { onChange: setRest, label: "Rest", value: workout.rest })),
           React.createElement("section", { className: "mv3 flex" },
               React.createElement("button", { onClick: reset, className: "mh3" }, "Reset"),
-              React.createElement("button", { onClick: effects(Workout.start, start).bind(undefined, workout), className: "mh3" }, "Go!"))));
+              React.createElement("button", { onClick: start, className: "mh3" }, "Go!"))));
   };
+  //# sourceMappingURL=Timer.js.map
 
-  const defaultWorkout = {
-      sets: 20,
-      work: 30 * 1000,
-      rest: 15 * 1000,
-      start: false,
-  };
-  const App = () => {
-      const [workout, setWorkout] = React.useState(Object.assign({}, defaultWorkout));
+  function makeWorkout(defaults) {
+      const [workout, setWorkout] = React.useState(() => defaults);
       const timer = {
-          setSets: (sets) => setWorkout(Object.assign({}, workout, { sets })),
-          setWork: (work) => setWorkout(Object.assign({}, workout, { work })),
-          setRest: (rest) => setWorkout(Object.assign({}, workout, { rest })),
-          start: () => setWorkout(Object.assign({}, workout, { start: true })),
-          reset: () => setWorkout(defaultWorkout)
+          setSets: (sets) => setWorkout(Object.assign(Object.assign({}, workout), { sets })),
+          setWork: (work) => setWorkout(Object.assign(Object.assign({}, workout), { work })),
+          setRest: (rest) => setWorkout(Object.assign(Object.assign({}, workout), { rest })),
+          start: () => effects(Workout.start, setWorkout)(Object.assign(Object.assign({}, workout), { start: true })),
+          reset: () => setWorkout(defaultWorkout),
       };
-      let Content = null;
-      if (workout.start) {
-          Content = React.createElement(Workout, Object.assign({}, workout));
-      }
-      else {
-          Content = React.createElement(Timer, Object.assign({ workout: workout }, timer));
-      }
-      return React.createElement(AppShell, null, Content);
+      return { workout, timer };
+  }
+  const App = () => {
+      const { workout, timer } = makeWorkout(defaultWorkout);
+      return (React.createElement(AppShell, null, workout.start ? React.createElement(Workout, Object.assign({}, workout)) : React.createElement(Timer, Object.assign({ workout: workout }, timer))));
   };
   //# sourceMappingURL=App.js.map
 
+  if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+  }
   ReactDOM.render(React.createElement(App, null), document.getElementById("app"));
   //# sourceMappingURL=index.js.map
 

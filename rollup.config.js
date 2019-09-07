@@ -1,6 +1,6 @@
-const typescript = require("rollup-plugin-typescript");
+import typescript from "rollup-plugin-typescript";
 
-export default {
+const pwa = {
   input: "./src/index.tsx",
   output: {
     file: "./public_html/app.js",
@@ -14,3 +14,15 @@ export default {
   external: ["react", "react-dom"],
   plugins: [typescript()],
 };
+
+const serviceWorker = {
+  input: "./src/service-worker.ts",
+  output: {
+    file: "./public_html/sw.js",
+    sourcemap: true,
+    format: "iife",
+  },
+  plugins: [typescript()],
+};
+
+export default [pwa, serviceWorker];
