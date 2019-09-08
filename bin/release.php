@@ -26,6 +26,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.6.0/NoSleep.min.js"></script>
   <script crossorigin="" src="https://unpkg.com/react@16.9.0/umd/react.production.min.js"></script>
   <script crossorigin="" src="https://unpkg.com/react-dom@16.9.0/umd/react-dom.production.min.js"></script>
-  <script src="/app.js?hash=%3C?=%20$hash;%20?%3E"></script>
+  <script src="/app.js?hash=<?= $hash ?>"></script>
 </body>
 </html>
