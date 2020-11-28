@@ -1,7 +1,6 @@
 import * as React from "react";
 import Stepper from "./Stepper";
 import { formattedDuration } from "./utils";
-
 type Props = TimerProps;
 
 const nullOnChange = (_x: number) => {};

@@ -4,9 +4,10 @@
   "description": "HIIT Timer",
   "main": "index.js",
   "scripts": {
+    "start": "",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c",
-    "watch": "rollup -cw",
+    "dev": "rollup -cw",
     "lint": "eslint --ext='.ts,.tsx' src"
   },
   "keywords": [],
@@ -14,12 +15,14 @@
   "homepage": "http://l33t-timer.keksipurkki.net",
   "license": "MIT",
   "devDependencies": {
-    "@types/react": "16.9.2",
-    "@types/react-dom": "16.9.0",
-    "rollup": "1.20.3",
-    "rollup-plugin-typescript": "1.0.1",
-    "tslib": "1.10.0",
-    "typescript": "3.6.2"
-  },
-  "dependencies": {}
+    "@rollup/plugin-html": "^0.2.0",
+    "@rollup/plugin-typescript": "^6.1.0",
+    "@types/react": "17.0.0",
+    "@types/react-dom": "17.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "eslint-plugin-react": "^7.21.5",
+    "rollup": "^2.33.3",
+    "tslib": "2.0.3",
+    "typescript": "4.1.2"
+  }
 }

@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": ["dom"],
+    "lib": ["dom", "es2019"],
     "jsx": "react",
     "sourceMap": false,
     "strict": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "noEmitOnError": true
   }
 }
-

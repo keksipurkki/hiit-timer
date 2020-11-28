@@ -1,4 +1,18 @@
-import typescript from "rollup-plugin-typescript";
+import typescript from "@rollup/plugin-typescript";
+import html from "@rollup/plugin-html";
+import { readFileSync } from "fs";
+import { randomBytes } from "crypto";
+
+const attributes = {
+  head: `<link rel="stylesheet" href="app.css?v=${randomBytes(8).toString("base64")}">`,
+  scripts: `<script src="app.js?v=${randomBytes(8).toString("base64")}"></script>`,
+};
+
+function template() {
+  const pattern = /{([^{}]*)}/g;
+  const mold = readFileSync("./index.template.html").toString();
+  return mold.replace(pattern, (_, attr) => attributes[attr]);
+}
 
 const pwa = {
   input: "./src/index.tsx",
@@ -7,12 +21,12 @@ const pwa = {
     sourcemap: true,
     format: "iife",
     globals: {
-      react: "React",
-      "react-dom": "ReactDOM"
-    }
+      "react": "React",
+      "react-dom": "ReactDOM",
+    },
   },
   external: ["react", "react-dom"],
-  plugins: [typescript()],
+  plugins: [typescript(), html({ template, fileName: "index.html" })],
 };
 
 const serviceWorker = {
