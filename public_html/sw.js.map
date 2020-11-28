@@ -1,1 +1,1 @@
-{"version":3,"file":"sw.js","sources":["../src/service-worker.ts"],"sourcesContent":["console.log(\"service worker hello!\");\n"],"names":[],"mappings":";;;CAAA,OAAO,CAAC,GAAG,CAAC,uBAAuB,CAAC,CAAC;;;;"}
+{"version":3,"file":"sw.js","sources":["../src/service-worker.ts"],"sourcesContent":[null],"names":[],"mappings":";;;CAAA,OAAO,CAAC,GAAG,CAAC,uBAAuB,CAAC;;;;;;"}
