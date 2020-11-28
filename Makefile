@@ -13,7 +13,10 @@ provision:
 
 deploy:
 	aws s3 sync public_html s3://$(S3_BUCKET) --delete --acl public-read
-	aws s3 cp s3://$(S3_BUCKET) s3://$(S3_BUCKET) --exclude "*" --include "*.css" --include "*.js" --include "*.png" --include "*.mp3" \
-	--recursive --metadata-directive REPLACE --expires 2034-01-01T00:00:00Z --acl public-read --cache-control $(CACHE_CONTROL)
-	git commit public_html -m "Deployment on $(shell date)" 
-
+	aws s3 cp s3://$(S3_BUCKET) s3://$(S3_BUCKET) --exclude "*" --include "*.css" \
+	--recursive --metadata-directive REPLACE --acl public-read --cache-control $(CACHE_CONTROL) --content-type text/css
+	aws s3 cp s3://$(S3_BUCKET) s3://$(S3_BUCKET) --exclude "*" --include "*.js"  \
+	--recursive --metadata-directive REPLACE --acl public-read --cache-control $(CACHE_CONTROL) --content-type application/javascript
+	aws s3 cp s3://$(S3_BUCKET) s3://$(S3_BUCKET) --exclude "*" --include "*.png" --include "*.mp3" \
+	--recursive --metadata-directive REPLACE --acl public-read --cache-control $(CACHE_CONTROL)
+	git commit public_html -m "Deployment on $(shell date)"
