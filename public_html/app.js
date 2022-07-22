@@ -1,20 +1,41 @@
 (function (React, ReactDOM) {
     'use strict';
 
+    function _interopNamespace(e) {
+        if (e && e.__esModule) return e;
+        var n = Object.create(null);
+        if (e) {
+            Object.keys(e).forEach(function (k) {
+                if (k !== 'default') {
+                    var d = Object.getOwnPropertyDescriptor(e, k);
+                    Object.defineProperty(n, k, d.get ? d : {
+                        enumerable: true,
+                        get: function () { return e[k]; }
+                    });
+                }
+            });
+        }
+        n["default"] = e;
+        return Object.freeze(n);
+    }
+
+    var React__namespace = /*#__PURE__*/_interopNamespace(React);
+    var ReactDOM__namespace = /*#__PURE__*/_interopNamespace(ReactDOM);
+
     function info() {
         window.alert("For best results, add this app to your home screen.");
     }
-    const AppShell = ({ children }) => (React.createElement(React.Fragment, null,
-        React.createElement("header", { className: "h3 flex items-center" },
-            React.createElement("img", { className: "mh2", width: "32", height: "32", src: "icons/icon-header.png" }),
-            React.createElement("a", { href: "/" },
-                React.createElement("h3", { className: "underline" }, document.title)),
-            React.createElement("div", { className: "ml-auto" },
-                React.createElement("a", { id: "install", onClick: info }))),
-        React.createElement("main", { className: "flex flex-column justify-center" },
-            React.createElement("div", { className: "flex flex-column center mv5" }, children))));
+    const AppShell = ({ children }) => (React__namespace.createElement(React__namespace.Fragment, null,
+        React__namespace.createElement("header", { className: "h3 flex items-center" },
+            React__namespace.createElement("img", { className: "mh2", width: "32", height: "32", src: "icons/icon-header.png" }),
+            React__namespace.createElement("a", { href: "/" },
+                React__namespace.createElement("h3", { className: "underline" }, document.title)),
+            React__namespace.createElement("div", { className: "ml-auto" },
+                React__namespace.createElement("a", { id: "install", onClick: info }))),
+        React__namespace.createElement("main", { className: "flex flex-column justify-center" },
+            React__namespace.createElement("div", { className: "flex flex-column center mv5" }, children))));
 
-    /*! *****************************************************************************
+    /******************************************************************************
     Copyright (c) Microsoft Corporation.
 
     Permission to use, copy, modify, and/or distribute this software for any
@@ -96,8 +117,8 @@
     }
     function makeIntervals(props) {
         const total = props.sets;
-        const [interval, setInterval] = React.useState(() => makeInterval(props, total));
-        React.useEffect(() => {
+        const [interval, setInterval] = React__namespace.useState(() => makeInterval(props, total));
+        React__namespace.useEffect(() => {
             if (interval && !interval.paused) {
                 return effect([interval, setInterval]);
             }
@@ -115,22 +136,22 @@
     const Workout = props => {
         const { togglePause, interval } = makeIntervals(props);
         if (interval) {
-            return (React.createElement(React.Fragment, null,
-                React.createElement("div", { className: "tc" },
-                    React.createElement("h2", { className: "mv2" }, formattedDuration(interval.remaining)),
-                    React.createElement("p", { className: "mt2 mb5" }, interval.label)),
-                React.createElement("section", { className: "flex" },
-                    React.createElement("button", { onClick: togglePause, className: "mh3" }, interval.paused ? "Resume" : "Pause"),
-                    React.createElement("button", { onClick: Workout.stop, className: "mh3" }, "Stop"))));
+            return (React__namespace.createElement(React__namespace.Fragment, null,
+                React__namespace.createElement("div", { className: "tc" },
+                    React__namespace.createElement("h2", { className: "mv2" }, formattedDuration(interval.remaining)),
+                    React__namespace.createElement("p", { className: "mt2 mb5" }, interval.label)),
+                React__namespace.createElement("section", { className: "flex" },
+                    React__namespace.createElement("button", { onClick: togglePause, className: "mh3" }, interval.paused ? "Resume" : "Pause"),
+                    React__namespace.createElement("button", { onClick: Workout.stop, className: "mh3" }, "Stop"))));
         }
         else {
-            return (React.createElement("div", { className: "tc" },
-                React.createElement("h2", null, "Congratulations!"),
-                React.createElement("p", null,
-                    React.createElement("a", { href: "/" }, "Next workout?")),
-                React.createElement("small", null,
+            return (React__namespace.createElement("div", { className: "tc" },
+                React__namespace.createElement("h2", null, "Congratulations!"),
+                React__namespace.createElement("p", null,
+                    React__namespace.createElement("a", { href: "/" }, "Next workout?")),
+                React__namespace.createElement("small", null,
                     "Brought to your by ",
-                    React.createElement("a", { href: "https://github.com/keksipurkki" }, "keksipurkki"))));
+                    React__namespace.createElement("a", { href: "https://github.com/keksipurkki" }, "keksipurkki"))));
         }
     };
     Workout.start = () => {
@@ -171,8 +192,8 @@
     Workout.stop = () => (window.location.href = "/");
 
     function useLongPress(effect, ms = 100) {
-        const [startLongPress, setStartLongPress] = React.useState(false);
-        React.useEffect(() => {
+        const [startLongPress, setStartLongPress] = React__namespace.useState(false);
+        React__namespace.useEffect(() => {
             let timerId = undefined;
             if (startLongPress) {
                 timerId = window.setTimeout(effect, ms);
@@ -196,11 +217,11 @@
             throw new Error("invalid_state");
         const decrementHandlers = useLongPress(() => onChange(decrement(value)));
         const incrementHandlers = useLongPress(() => onChange(increment(value)));
-        return (React.createElement("form", { className: "noselect" },
-            React.createElement("label", { className: "mr3 w3 dib" }, label),
-            React.createElement("button", Object.assign({ type: "button" }, decrementHandlers), "\u2212"),
-            React.createElement("input", { type: "text", readOnly: true, value: format(value) }),
-            React.createElement("button", Object.assign({ type: "button" }, incrementHandlers), "+")));
+        return (React__namespace.createElement("form", { className: "noselect" },
+            React__namespace.createElement("label", { className: "mr3 w3 dib" }, label),
+            React__namespace.createElement("button", Object.assign({ type: "button" }, decrementHandlers), "\u2212"),
+            React__namespace.createElement("input", { type: "text", readOnly: true, value: format(value) }),
+            React__namespace.createElement("button", Object.assign({ type: "button" }, incrementHandlers), "+")));
     };
     Stepper.defaultProps = {
         label: "Label",
@@ -215,27 +236,27 @@
         const step = 1; // rounds
         const increment = (value) => Math.min(value + step, 40);
         const decrement = (value) => Math.max(value - step, 1);
-        return (React.createElement(Stepper, { onChange: onChange, label: label, value: value, increment: increment, decrement: decrement }));
+        return (React__namespace.createElement(Stepper, { onChange: onChange, label: label, value: value, increment: increment, decrement: decrement }));
     }
     function TimeStepper({ value = 0, onChange = nullOnChange, label = "Label" } = {}) {
         const step = 1000; // millis
         const next = (value) => Math.min(value + step, 60 * 1000);
         const prev = (value) => Math.max(value - step, 5 * 1000);
-        return (React.createElement(Stepper, { onChange: onChange, value: value, label: label, increment: next, decrement: prev, format: formattedDuration }));
+        return (React__namespace.createElement(Stepper, { onChange: onChange, value: value, label: label, increment: next, decrement: prev, format: formattedDuration }));
     }
     const Timer = ({ start, reset, setSets, setWork, setRest, workout }) => {
-        return (React.createElement(React.Fragment, null,
-            React.createElement("section", { className: "flex flex-column mv3" },
-                React.createElement(IntegerStepper, { onChange: setSets, label: "Sets", value: workout.sets }),
-                React.createElement(TimeStepper, { onChange: setWork, label: "Work", value: workout.work }),
-                React.createElement(TimeStepper, { onChange: setRest, label: "Rest", value: workout.rest })),
-            React.createElement("section", { className: "mv3 flex" },
-                React.createElement("button", { onClick: reset, className: "mh3" }, "Reset"),
-                React.createElement("button", { onClick: start, className: "mh3" }, "Go!"))));
+        return (React__namespace.createElement(React__namespace.Fragment, null,
+            React__namespace.createElement("section", { className: "flex flex-column mv3" },
+                React__namespace.createElement(IntegerStepper, { onChange: setSets, label: "Sets", value: workout.sets }),
+                React__namespace.createElement(TimeStepper, { onChange: setWork, label: "Work", value: workout.work }),
+                React__namespace.createElement(TimeStepper, { onChange: setRest, label: "Rest", value: workout.rest })),
+            React__namespace.createElement("section", { className: "mv3 flex" },
+                React__namespace.createElement("button", { onClick: reset, className: "mh3" }, "Reset"),
+                React__namespace.createElement("button", { onClick: start, className: "mh3" }, "Go!"))));
     };
 
     function makeWorkout(defaults) {
-        const [workout, setWorkout] = React.useState(() => defaults);
+        const [workout, setWorkout] = React__namespace.useState(() => defaults);
         const timer = {
             setSets: (sets) => setWorkout(Object.assign(Object.assign({}, workout), { sets })),
             setWork: (work) => setWorkout(Object.assign(Object.assign({}, workout), { work })),
@@ -247,13 +268,13 @@
     }
     const App = () => {
         const { workout, timer } = makeWorkout(defaultWorkout);
-        return (React.createElement(AppShell, null, workout.start ? React.createElement(Workout, Object.assign({}, workout)) : React.createElement(Timer, Object.assign({ workout: workout }, timer))));
+        return (React__namespace.createElement(AppShell, null, workout.start ? React__namespace.createElement(Workout, Object.assign({}, workout)) : React__namespace.createElement(Timer, Object.assign({ workout: workout }, timer))));
     };
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js');
     }
-    ReactDOM.render(React.createElement(App, null), document.getElementById("app"));
+    ReactDOM__namespace.render(React__namespace.createElement(App, null), document.getElementById("app"));
 
-}(React, ReactDOM));
+})(React, ReactDOM);
 //# sourceMappingURL=app.js.map

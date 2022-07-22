@@ -3,5 +3,5 @@
 
 	console.log("service worker hello!");
 
-}());
+})();
 //# sourceMappingURL=sw.js.map

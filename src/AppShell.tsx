@@ -4,7 +4,7 @@ function info() {
   window.alert("For best results, add this app to your home screen.");
 }
 
-const AppShell: React.FC = ({ children }) => (
+const AppShell: ReactComponent = ({ children }) => (
   <>
     <header className="h3 flex items-center">
       <img className="mh2" width="32" height="32" src="icons/icon-header.png" />
