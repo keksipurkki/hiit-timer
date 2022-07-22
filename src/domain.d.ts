@@ -21,6 +21,7 @@ interface TimerProps {
 
 interface IntervalProps {
   label: string;
+  subLabel?: string;
   remaining: number;
   color: string;
   next: Nullable<IntervalProps>;

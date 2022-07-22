@@ -102,12 +102,14 @@
         }
         const next = makeInterval(Object.assign(Object.assign({}, rest), { sets: sets - 1 }), total);
         return {
-            label: "Rest",
+            label: `Rest`,
+            subLabel: `Round ${total - sets + 1} coming up`,
             color: "#222",
             paused: false,
             remaining: props.rest,
             next: {
                 label: `Round ${total - sets + 1} / ${total}`,
+                subLabel: `Work work work!`,
                 paused: false,
                 remaining: props.work,
                 color: colorWheel[sets % colorWheel.length],
@@ -133,14 +135,15 @@
             interval,
         };
     }
-    const Workout = props => {
+    const Workout = (props) => {
         const { togglePause, interval } = makeIntervals(props);
         if (interval) {
             return (React__namespace.createElement(React__namespace.Fragment, null,
                 React__namespace.createElement("div", { className: "tc" },
                     React__namespace.createElement("h2", { className: "mv2" }, formattedDuration(interval.remaining)),
-                    React__namespace.createElement("p", { className: "mt2 mb5" }, interval.label)),
-                React__namespace.createElement("section", { className: "flex" },
+                    React__namespace.createElement("p", { className: "m0", style: { lineHeight: "0" } }, interval.label),
+                    React__namespace.createElement("small", { className: "db" }, interval.subLabel || React__namespace.createElement(React__namespace.Fragment, null, "\u00A0"))),
+                React__namespace.createElement("section", { className: "flex mv4" },
                     React__namespace.createElement("button", { onClick: togglePause, className: "mh3" }, interval.paused ? "Resume" : "Pause"),
                     React__namespace.createElement("button", { onClick: Workout.stop, className: "mh3" }, "Stop"))));
         }
@@ -150,7 +153,8 @@
                 React__namespace.createElement("p", null,
                     React__namespace.createElement("a", { href: "/" }, "Next workout?")),
                 React__namespace.createElement("small", null,
-                    "Brought to your by ",
+                    "Brought to your by",
+                    " ",
                     React__namespace.createElement("a", { href: "https://github.com/keksipurkki" }, "keksipurkki"))));
         }
     };

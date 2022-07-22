@@ -22,7 +22,8 @@ function backgroundEffect([interval]: IntervalTuple) {
 function tickEffect([interval, setInterval]: IntervalTuple) {
   const timeout = 1000; // millis
   const { remaining, next } = interval;
-  const updated = remaining > 0 ? { ...interval, remaining: remaining - timeout } : next;
+  const updated =
+    remaining > 0 ? { ...interval, remaining: remaining - timeout } : next;
   const timer = window.setTimeout(setInterval, timeout, updated);
   return () => window.clearTimeout(timer);
 }
@@ -34,7 +35,10 @@ function soundEffect([interval]: IntervalTuple) {
 
 const effect = effects(tickEffect, soundEffect, backgroundEffect);
 
-function makeInterval(props: WorkoutProps, total: number): Nullable<IntervalProps> {
+function makeInterval(
+  props: WorkoutProps,
+  total: number
+): Nullable<IntervalProps> {
   const { sets, ...rest } = props;
 
   if (sets <= 0) {
@@ -50,12 +54,14 @@ function makeInterval(props: WorkoutProps, total: number): Nullable<IntervalProp
   );
 
   return {
-    label: "Rest",
+    label: `Rest`,
+    subLabel: `Round ${total - sets + 1} coming up`,
     color: "#222",
     paused: false,
     remaining: props.rest,
     next: {
       label: `Round ${total - sets + 1} / ${total}`,
+      subLabel: `Work work work!`,
       paused: false,
       remaining: props.work,
       color: colorWheel[sets % colorWheel.length],
@@ -66,7 +72,9 @@ function makeInterval(props: WorkoutProps, total: number): Nullable<IntervalProp
 
 function makeIntervals(props: WorkoutProps): Intervals {
   const total = props.sets;
-  const [interval, setInterval] = React.useState(() => makeInterval(props, total));
+  const [interval, setInterval] = React.useState(() =>
+    makeInterval(props, total)
+  );
 
   React.useEffect(() => {
     if (interval && !interval.paused) {
@@ -84,19 +92,21 @@ function makeIntervals(props: WorkoutProps): Intervals {
     togglePause,
     interval,
   };
-
 }
 
-const Workout: React.FC<Props> & StaticProps = props => {
+const Workout: React.FC<Props> & StaticProps = (props) => {
   const { togglePause, interval } = makeIntervals(props);
   if (interval) {
     return (
       <>
         <div className="tc">
           <h2 className="mv2">{formattedDuration(interval.remaining)}</h2>
-          <p className="mt2 mb5">{interval.label}</p>
+          <p className="m0" style={{ lineHeight: "0" }}>
+            {interval.label}
+          </p>
+          <small className="db">{interval.subLabel || <>&nbsp;</>}</small>
         </div>
-        <section className="flex">
+        <section className="flex mv4">
           <button onClick={togglePause} className="mh3">
             {interval.paused ? "Resume" : "Pause"}
           </button>
@@ -114,7 +124,8 @@ const Workout: React.FC<Props> & StaticProps = props => {
           <a href="/">Next workout?</a>
         </p>
         <small>
-          Brought to your by <a href="https://github.com/keksipurkki">keksipurkki</a>
+          Brought to your by{" "}
+          <a href="https://github.com/keksipurkki">keksipurkki</a>
         </small>
       </div>
     );
@@ -122,7 +133,6 @@ const Workout: React.FC<Props> & StaticProps = props => {
 };
 
 Workout.start = () => {
-
   console.log("Assigning side effects to the workout");
 
   /* Prevent device from going to standby */
@@ -161,7 +171,6 @@ Workout.start = () => {
   };
 
   window.HiitTimer = HiitTimer;
-
 };
 
 Workout.stop = () => (window.location.href = "/");
