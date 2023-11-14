@@ -22,7 +22,7 @@ const pwa = {
     format: "iife",
     globals: {
       "react": "React",
-      "react-dom": "ReactDOM",
+      "react-dom/client": "ReactDOM",
     },
   },
   external: ["react", "react-dom"],

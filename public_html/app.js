@@ -1,8 +1,7 @@
 (function (React, ReactDOM) {
     'use strict';
 
-    function _interopNamespace(e) {
-        if (e && e.__esModule) return e;
+    function _interopNamespaceDefault(e) {
         var n = Object.create(null);
         if (e) {
             Object.keys(e).forEach(function (k) {
@@ -15,12 +14,12 @@
                 }
             });
         }
-        n["default"] = e;
+        n.default = e;
         return Object.freeze(n);
     }
 
-    var React__namespace = /*#__PURE__*/_interopNamespace(React);
-    var ReactDOM__namespace = /*#__PURE__*/_interopNamespace(ReactDOM);
+    var React__namespace = /*#__PURE__*/_interopNamespaceDefault(React);
+    var ReactDOM__namespace = /*#__PURE__*/_interopNamespaceDefault(ReactDOM);
 
     function info() {
         window.alert("For best results, add this app to your home screen.");
@@ -49,6 +48,8 @@
     OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
     PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
+    /* global Reflect, Promise, SuppressedError, Symbol */
+
 
     function __rest(s, e) {
         var t = {};
@@ -61,6 +62,11 @@
             }
         return t;
     }
+
+    typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+        var e = new Error(message);
+        return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+    };
 
     const defaultWorkout = {
         sets: 20,
@@ -278,7 +284,8 @@
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js');
     }
-    ReactDOM__namespace.render(React__namespace.createElement(App, null), document.getElementById("app"));
+    const root = ReactDOM__namespace.createRoot(document.getElementById("app"));
+    root.render(React__namespace.createElement(App, null));
 
 })(React, ReactDOM);
 //# sourceMappingURL=app.js.map

@@ -10,7 +10,7 @@ const rules = {
 const settings = {
   react: {
     pragma: "React",
-    version: "latest",
+    version: "detect",
   },
 };
 
