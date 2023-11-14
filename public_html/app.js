@@ -34,40 +34,6 @@
         React__namespace.createElement("main", { className: "flex flex-column justify-center" },
             React__namespace.createElement("div", { className: "flex flex-column center mv5" }, children))));
 
-    /******************************************************************************
-    Copyright (c) Microsoft Corporation.
-
-    Permission to use, copy, modify, and/or distribute this software for any
-    purpose with or without fee is hereby granted.
-
-    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-    PERFORMANCE OF THIS SOFTWARE.
-    ***************************************************************************** */
-    /* global Reflect, Promise, SuppressedError, Symbol */
-
-
-    function __rest(s, e) {
-        var t = {};
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-            t[p] = s[p];
-        if (s != null && typeof Object.getOwnPropertySymbols === "function")
-            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-                if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                    t[p[i]] = s[p[i]];
-            }
-        return t;
-    }
-
-    typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
-        var e = new Error(message);
-        return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
-    };
-
     const defaultWorkout = {
         sets: 20,
         work: 30 * 1000,
@@ -92,7 +58,7 @@
     function tickEffect([interval, setInterval]) {
         const timeout = 1000; // millis
         const { remaining, next } = interval;
-        const updated = remaining > 0 ? Object.assign(Object.assign({}, interval), { remaining: remaining - timeout }) : next;
+        const updated = remaining > 0 ? { ...interval, remaining: remaining - timeout } : next;
         const timer = window.setTimeout(setInterval, timeout, updated);
         return () => window.clearTimeout(timer);
     }
@@ -102,11 +68,14 @@
     }
     const effect = effects(tickEffect, soundEffect, backgroundEffect);
     function makeInterval(props, total) {
-        const { sets } = props, rest = __rest(props, ["sets"]);
+        const { sets, ...rest } = props;
         if (sets <= 0) {
             return null;
         }
-        const next = makeInterval(Object.assign(Object.assign({}, rest), { sets: sets - 1 }), total);
+        const next = makeInterval({
+            ...rest,
+            sets: sets - 1,
+        }, total);
         return {
             label: `Rest`,
             subLabel: `Round ${total - sets + 1} coming up`,
@@ -133,7 +102,7 @@
         });
         const togglePause = () => {
             if (interval) {
-                setInterval(Object.assign(Object.assign({}, interval), { paused: !interval.paused }));
+                setInterval({ ...interval, paused: !interval.paused });
             }
         };
         return {
@@ -229,9 +198,9 @@
         const incrementHandlers = useLongPress(() => onChange(increment(value)));
         return (React__namespace.createElement("form", { className: "noselect" },
             React__namespace.createElement("label", { className: "mr3 w3 dib" }, label),
-            React__namespace.createElement("button", Object.assign({ type: "button" }, decrementHandlers), "\u2212"),
+            React__namespace.createElement("button", { type: "button", ...decrementHandlers }, "\u2212"),
             React__namespace.createElement("input", { type: "text", readOnly: true, value: format(value) }),
-            React__namespace.createElement("button", Object.assign({ type: "button" }, incrementHandlers), "+")));
+            React__namespace.createElement("button", { type: "button", ...incrementHandlers }, "+")));
     };
     Stepper.defaultProps = {
         label: "Label",
@@ -268,17 +237,17 @@
     function makeWorkout(defaults) {
         const [workout, setWorkout] = React__namespace.useState(() => defaults);
         const timer = {
-            setSets: (sets) => setWorkout(Object.assign(Object.assign({}, workout), { sets })),
-            setWork: (work) => setWorkout(Object.assign(Object.assign({}, workout), { work })),
-            setRest: (rest) => setWorkout(Object.assign(Object.assign({}, workout), { rest })),
-            start: () => effects(Workout.start, setWorkout)(Object.assign(Object.assign({}, workout), { start: true })),
+            setSets: (sets) => setWorkout({ ...workout, sets }),
+            setWork: (work) => setWorkout({ ...workout, work }),
+            setRest: (rest) => setWorkout({ ...workout, rest }),
+            start: () => effects(Workout.start, setWorkout)({ ...workout, start: true }),
             reset: () => setWorkout(defaultWorkout),
         };
         return { workout, timer };
     }
     const App = () => {
         const { workout, timer } = makeWorkout(defaultWorkout);
-        return (React__namespace.createElement(AppShell, null, workout.start ? React__namespace.createElement(Workout, Object.assign({}, workout)) : React__namespace.createElement(Timer, Object.assign({ workout: workout }, timer))));
+        return (React__namespace.createElement(AppShell, null, workout.start ? React__namespace.createElement(Workout, { ...workout }) : React__namespace.createElement(Timer, { workout: workout, ...timer })));
     };
 
     if ('serviceWorker' in navigator) {
